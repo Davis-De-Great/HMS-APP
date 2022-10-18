@@ -6,10 +6,10 @@ const jwt = require('jsonwebtoken');
 
 module.exports = {
     sign_Up: async(req,res) =>{
-        let {hospital_name, email, phone_no, address, city, state, password, confirm_pass} = req.body;
+        let {hospital_name, email, phone_no, address, city, state, website, password, confirm_pass} = req.body;
 
-        let regexName = /^[a-zA-Z-]{1,100}$/;
-        let regexEmail =  /(^[a-zA-Z0-9\.]{2,10})+@([\w-]+\.)+[\w-]{1,3}$/;
+        let regexName = /^[a-zA-Z0-9-]{1,100}$/;
+        let regexEmail =  /(^[a-zA-Z0-9\.]{2,20})+@([\w-]+\.)+[\w-]{1,3}$/;
         let regexPhoneNo =  /(^(\+[0-9]{1,3}|0)[0-9]{3}( ){0,1}[0-9]{7,8}){1,11}\b/;
         let regexPassword = /^([a-zA-Z0-9\@%$#&*?<>+=_\-*^!`~:;"',.]{6,})$/;
 
@@ -65,22 +65,29 @@ module.exports = {
                 address, 
                 city, 
                 state, 
+                website,
                 password
             })
-            console.log(_hospital);
-            return res.status(200).json({success: "Hospital has successfully been created"})
+            const token = jwt.sign({encod: _hospital._id}, process.env.SECRETE_KEY, {expiresIn: 60*60*24*1000});
+            console.log(token)
 
-        } catch (err) {
-            let error = errorHandler(err);
-            return res.status(400).json({error});
-        }
+            res.cookie('token', token, 60*60*24*1000);
+            
+            // console.log("New hospital has registered: ", hospital)
+            return res.status(200).json({success: 'Account created successfully'});
+    
+            }catch (err) {
+               let error = errorHandler(err);
+               console.log(error)
+               return res.status(200).json({error});
+            }
     },
 
     // Login 
     login: async (req,res)=>{
         let {email, password} = req.body;
 
-        let regexAB = /(^[a-zA-Z0-9\.]{2,10})+@([\w-]+\.)+[\w-]{1,3}$/;
+        let regexAB = /(^[a-zA-Z0-9\.]{2,20})+@([\w-]+\.)+[\w-]{1,3}$/;
         let regexPassword = /^([a-zA-Z0-9\@%$#&*?<>+=_\-*^!`~:;"',.]{6,})$/;
 
         if (email<1) {
@@ -98,16 +105,16 @@ module.exports = {
         }
 
         try {
-            const u = await User.login(email, password);
-            // console.log(u);
-            const token = jwt.sign({encod: u._id}, process.env.SECRETE, {expiresIn: 60*60*24*1000});
+            const H = await Hospital.login(email, password);
+            // console.log(H);
+            const token = jwt.sign({encod: H._id}, process.env.SECRETE_KEY, {expiresIn: 60*60*24*1000});
             console.log(token)
 
             res.cookie('token', token, 60*60*24*1000);
             
             return res.status(200).json({Success: "Login successfull"});
         } catch (err) {
-            let error = error_Handler(err);
+            let error = errorHandler(err);
             console.log(error);
             return res.status(401).json({error});
         }        

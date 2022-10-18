@@ -17,11 +17,11 @@ app.use(cookieParser());
 // Importing modules
 const dbConnection = require("./config/dbConnection");
 const authRoute = require("./src/routes/authRoute");
-const superAdminCont = require("./src/routes/superAdminRoute");
+const superAdminRout = require("./src/routes/superAdminRoute");
 
 // Using imported modules
-app.use("/api/auth", authRoute);
-app.use("/api", superAdminCont)
+app.use("/api", authRoute);
+app.use("/api", superAdminRout)
 
 // DB connection
 dbConnection();

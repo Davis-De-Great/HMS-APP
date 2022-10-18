@@ -1,12 +1,12 @@
 
 const Hospital = require("../models/hospitalModel");
 
-module.export = {
+module.exports = {
     
     create_hospital: async(req,res)=>{
         try {
             const hospital_id = req.query.hospitalId;
-            const hosp = await User.findOneAndUpdate({_id: hospital_id}, {hospital: true});
+            const hosp = await Hospital.findOneAndUpdate({_id: hospital_id}, {role: "hospital"});
             console.log(hosp);
             return res.status(200).json({hosp});
         } catch (error) {
@@ -16,7 +16,7 @@ module.export = {
 
     view_hospitals: async(req,res)=>{
         try {
-            const hospitals = await User.find();
+            const hospitals = await Hospital.find();
             return res.status(200).json({hospitals});
         } catch (error) {
             let err = "No user found";
